@@ -38,6 +38,7 @@
  *     v0.5.3   2019-04-16  Gabriele        Added app events to have some historic logging
  *     v0.5.4   2019-06-24  Dan Ogorchock   Attempt to add Australia
  *     v0.5.5   2019-07-18  Dan Ogorchock   Reduced Debug Logging
+ *     v0.5.6   2019-09-27  Daniel Terryn   Save last used CSRF value and try it in case we can't find a new one 
  *
  */
 
@@ -116,6 +117,28 @@ def pageTwo(){
     }
 }
 
+def getCsrf()
+{
+    try
+    {
+        if (alexaCookie)
+        {
+            def csrf = (alexaCookie =~ "csrf=(.*?);")[0][1]
+            if ((csrf) && (csrf != lastCsrf))
+                app.updateSetting("lastCsrf",[type:"text", value: csrf])
+            return csrf
+        }
+    }
+    catch (e)
+    {
+        log.debug "Can't get CSRF from alexaCookie"
+        if (lastCsrf) {
+            log.debug "Try to use last saved csrf ${lastCsrf}"
+            return lastCsrf
+        }
+        return null
+    }
+}
 
 def speakMessage(String message, String device) {
     log.debug "Sending '${message}' to '${device}'"
@@ -139,7 +162,7 @@ def speakMessage(String message, String device) {
                     def LANGUAGE = getURLs()."${alexaCountry}".Language
                     def TTS= ",\\\"textToSpeak\\\":\\\"${message}\\\""
                     def command = "{\"behaviorId\":\"PREVIEW\",\"sequenceJson\":\"{\\\"@type\\\":\\\"com.amazon.alexa.behaviors.model.Sequence\\\",\\\"startNode\\\":{\\\"@type\\\":\\\"com.amazon.alexa.behaviors.model.OpaquePayloadOperationNode\\\",\\\"type\\\":\\\"${SEQUENCECMD}\\\",\\\"operationPayload\\\":{\\\"deviceType\\\":\\\"${DEVICETYPE}\\\",\\\"deviceSerialNumber\\\":\\\"${DEVICESERIALNUMBER}\\\",\\\"locale\\\":\\\"${LANGUAGE}\\\",\\\"customerId\\\":\\\"${MEDIAOWNERCUSTOMERID}\\\"${TTS}}}}\",\"status\":\"ENABLED\"}"
-                    def csrf = (alexaCookie =~ "csrf=(.*?);")[0][1]
+                    def csrf = getCsrf()
 
                     def params = [uri: "https://" + getURLs()."${alexaCountry}".Alexa + "/api/behaviors/preview",
                                   headers: ["Cookie":"""${alexaCookie}""",
@@ -208,7 +231,7 @@ def setVolume(float volume, String device) {
                     def LANGUAGE = getURLs()."${alexaCountry}".Language
 					def command = "{\"type\":\"VolumeLevelCommand\",\"volumeLevel\": ${vol}}"
 
-					def csrf = (alexaCookie =~ "csrf=(.*?);")[0][1]
+					def csrf = getCsrf()
 
                     def params = [uri: "https://" + getURLs()."${alexaCountry}".Amazon + "/api/np/command?deviceSerialNumber=${DEVICESERIALNUMBER}&deviceType=${DEVICETYPE}",
                                   headers: ["Cookie":"""${alexaCookie}""",
@@ -259,7 +282,7 @@ def getDevices() {
     if (alexaCookie == null) {log.debug "No cookie yet"
                               return}   
     try{
-        def csrf = (alexaCookie =~ "csrf=(.*?);")[0][1]
+        def csrf = getCsrf()
         def params = [uri: "https://" + getURLs()."${alexaCountry}".Alexa + "/api/devices-v2/device?cached=false",
                       headers: ["Cookie":"""${alexaCookie}""",
                                 "Referer": "https://" + getURLs()."${alexaCountry}".Amazon + "/spa/index.html",
