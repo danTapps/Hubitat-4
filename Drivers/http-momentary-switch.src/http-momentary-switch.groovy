@@ -75,6 +75,7 @@ def runCmd(String varCommand, String method) {
     	headers.put("HOST", "${deviceIP}:${localDevicePort}")
 	headers.put("Content-Type", deviceContent)
     	if (deviceExtraHeader) {
+		log.debug "Add extra header ${deviceExtraHeader}"
         	def deviceExtraHeaderT = deviceExtraHeader.tokenize(':')
         	if (deviceExtraHeaderT.size() > 1)
            		headers.put(deviceExtraHeaderT[0], deviceExtraHeaderT[1])
