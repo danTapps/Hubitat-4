@@ -18,7 +18,7 @@
  *    ----        ---             ----
  *    2018-02-18  Dan Ogorchock   Original Creation
  *    2019-10-11  Stephan Hackett Added ContentType and Body inputs(very limited functionality)
- * 
+ *    2019-12-26  Daniel Terryn	  Added extra header setting
  */
 metadata {
 	definition (name: "HTTP Momentary Switch", namespace: "ogiewon", author: "Dan Ogorchock", importUrl: "https://raw.githubusercontent.com/danTapps/Hubitat-4/master/Drivers/http-momentary-switch.src/http-momentary-switch.groovy") {
