@@ -21,7 +21,7 @@
  * 
  */
 metadata {
-	definition (name: "HTTP Momentary Switch", namespace: "ogiewon", author: "Dan Ogorchock") {
+	definition (name: "HTTP Momentary Switch", namespace: "ogiewon", author: "Dan Ogorchock", importUrl: "https://raw.githubusercontent.com/danTapps/Hubitat-4/master/Drivers/http-momentary-switch.src/http-momentary-switch.groovy") {
         capability "Switch"
         capability "Momentary"
 	}
@@ -33,7 +33,7 @@ metadata {
 		input(name: "deviceMethod", type: "enum", title: "POST, GET, or PUT", options: ["POST","GET","PUT"], defaultValue: "POST", required: true, displayDuringSetup: true)
 		input(name: "deviceContent", type: "enum", title: "Content-Type", options: getCtype(), defaultValue: "application/x-www-form-urlencoded", required: true, displayDuringSetup: true)
 		input(name: "deviceBody", type: "string", title:"Body", description: "Body of message", displayDuringSetup: true)
-        input(name: "deviceExtraHeader", type: "string", title:"Body", description: "Body of message", displayDuringSetup: true)
+        	input(name: "deviceExtraHeader", type: "string", title:"Extra Header", description: "Extra Header seperated by : ", displayDuringSetup: true)
 	}
 }
 
